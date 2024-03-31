@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body, html {
+      margin: 0;
+      padding: 0;
+      overflow: hidden; /* Prevent scrolling */
+      width: 100%; /* Set width to 100% of the screen */
+      height: 100%; /* Set height to 100% of the screen */
+      background-color: #ffcccc; /* Very bleached red background color */
+    }
+    canvas {
+      position: fixed; /* Set the position to fixed to cover the entire screen */
+      left: 0; /* Set the left edge to 0 */
+      top: 0; /* Set the top edge to 0 */
+      width: 100%; /* Set canvas width to 100% of the viewport width */
+      height: 100%; /* Set canvas height to 100% of the viewport height */
+      filter: blur(5px); /* Apply a 5px blur effect to the canvas */
+    }
+  </style>
+  <title>Lava Lamp Background with Poodly Effects</title>
+</head>
+<body>
+  <canvas id="cnvs"></canvas>
+  <script>
+    const canvas = document.getElementById('cnvs');
+    const ctx = canvas.getContext('2d');
+    canvas.style.width = '100%'; // Set canvas width to 100% of the screen
+    canvas.style.height = '100%'; // Set canvas height to 100% of the screen
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    const numBlobs = window.innerWidth * window.innerHeight / 1000; // Adjust the divisor as needed
+    const blobs = [];
+    for (let i = 0; i < numBlobs; i++) {
+      const blob = {
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        radius: Math.random() * 60 + 20, // Increased size of blobs for a smoother effect
+        dx: Math.random() * 2 - 1, // Random horizontal movement
+        dy: Math.random() * 2 - 1, // Random vertical movement
+        color: `hsl(${Math.random() * 60 + 20}, 100%, 50%)`
+      };
+      blobs.push(blob);
+    }
+    function drawBackground() {
+      ctx.fillStyle = 'rgba(255, 0, 0, 0.5)'; // Soft red background with 50% transparency
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+    }
+    function draw() {
+      drawBackground(); // Draw the flowing background
+      for (let i = 0; i < blobs.length; i++) {
+        const blob = blobs[i];
+        ctx.beginPath();
+        ctx.arc(blob.x, blob.y, blob.radius, 0, Math.PI * 2);
+        const gradient = ctx.createRadialGradient(blob.x, blob.y, 0, blob.x, blob.y, blob.radius);
+        gradient.addColorStop(0, blob.color);
+        gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
+        ctx.fillStyle = gradient;
+        ctx.fill();
+        blob.x += blob.dx;
+        blob.y += blob.dy;
+        if (blob.x - blob.radius > canvas.width) {
+          blob.x = 0 - blob.radius;
+        }
+        if (blob.x + blob.radius < 0) {
+          blob.x = canvas.width + blob.radius;
+        }
+        if (blob.y - blob.radius > canvas.height) {
+          blob.y = 0 - blob.radius;
+        }
+        if (blob.y + blob.radius < 0) {
+          blob.y = canvas.height + blob.radius;
+        }
+      }
+      requestAnimationFrame(draw);
+    }
+    function moveCanvas() {
+      canvas.style.transform = `translateY(${parseInt(canvas.style.transform.match(/-?\d+/)[0]) + 1}px)`; // Move the canvas down by 1px
+      if (parseInt(canvas.style.transform.match(/-?\d+/)[0]) >= canvas.height) {
+        canvas.style.transform = 'translateY(0)'; // Reset the position to the top
+      }
+      requestAnimationFrame(moveCanvas);
+    }
+    draw(); // Start the animation
+    moveCanvas(); // Start the continuous movement of the canvas
+  </script>
+</body>
+</html>
